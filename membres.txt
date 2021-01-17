@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-hello -Oleg
-=======
+Alessandro
+Oleg
 David Mamou
->>>>>>> d756ed166f5d233eb4c6ef48a3a0db5447922e3e
