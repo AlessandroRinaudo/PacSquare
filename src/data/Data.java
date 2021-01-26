@@ -24,6 +24,11 @@ public class Data implements DataService{
   private ArrayList<PhantomService> phantoms;
   private double heroesWidth,heroesHeight,phantomWidth,phantomHeight;
   private Sound.SOUND sound;
+  double minX,maxX,minY,maxY;
+  ArrayList<Position> fruits;
+
+
+  
 
   public Data(){}
 
@@ -39,6 +44,12 @@ public class Data implements DataService{
     phantomWidth = HardCodedParameters.phantomWidth;
     phantomHeight = HardCodedParameters.phantomHeight;
     sound = Sound.SOUND.None;
+    minX = HardCodedParameters.minX;
+    maxX = HardCodedParameters.maxX;
+    minY = HardCodedParameters.minY;
+    maxY = HardCodedParameters.maxY;
+
+
   }
 
   @Override

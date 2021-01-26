@@ -60,7 +60,7 @@ public class Engine implements EngineService, RequireDataService{
         System.out.println(data.getHeroesPosition().x);
         //System.out.println("Game step #"+data.getStepNumber()+": checked.");
         
-        if (gen.nextInt(10)<3) spawnPhantom();
+        if (gen.nextInt(10)<0.01 && data.getPhantoms().size()<5) spawnPhantom();
 
         updateSpeedHeroes();
         updateCommandHeroes();
@@ -70,12 +70,24 @@ public class Engine implements EngineService, RequireDataService{
         int score=0;
 
         data.setSoundEffect(Sound.SOUND.None);
+        /*
+        if (ding()) {
+        	if (collisionHeroesPhantom(p)){
+                data.setSoundEffect(Sound.SOUND.HeroesGotHit);
+                score++;
+              } else {
+                if (p.getPosition().x>0) phantoms.add(p);
+              }
+        }
+        */
+        
+        
 
         for (PhantomService p:data.getPhantoms()){
-          if (p.getAction()==PhantomService.MOVE.LEFT) moveLeft(p);
+       /*   if (p.getAction()==PhantomService.MOVE.LEFT) moveLeft(p);
           if (p.getAction()==PhantomService.MOVE.RIGHT) moveRight(p);
           if (p.getAction()==PhantomService.MOVE.UP) moveUp(p);
-          if (p.getAction()==PhantomService.MOVE.DOWN) moveDown(p);
+          if (p.getAction()==PhantomService.MOVE.DOWN) moveDown(p);*/
 
           if (collisionHeroesPhantom(p)){
             data.setSoundEffect(Sound.SOUND.HeroesGotHit);
@@ -121,7 +133,7 @@ public class Engine implements EngineService, RequireDataService{
   }
 
   private void updateCommandHeroes(){
-    double xShrink=1;
+   /* double xShrink=1;
     double yShrink=1;
     double shrink=Math.min(xShrink,yShrink);
     double xModifier=.01*shrink*HardCodedParameters.defaultWidth;
@@ -131,21 +143,32 @@ public class Engine implements EngineService, RequireDataService{
     if (moveLeft && data.getHeroesPosition().x >= 45) heroesVX-=heroesStep;
     if (moveRight &&  data.getHeroesPosition().x <= xModifier*0.95) heroesVX+=heroesStep;
     if (moveUp && data.getHeroesPosition().y >= 80) heroesVY-=heroesStep;
-    if (moveDown && data.getHeroesPosition().y <= yModifier*0.85) heroesVY+=heroesStep;
+    if (moveDown && data.getHeroesPosition().y <= yModifier*0.85) heroesVY+=heroesStep;*/
+	    if (moveLeft) heroesVX-=heroesStep;
+	    if (moveRight) heroesVX+=heroesStep;
+	    if (moveUp) heroesVY-=heroesStep;
+	    if (moveDown) heroesVY+=heroesStep;
   }
   
   private void updatePositionHeroes(){
-    data.setHeroesPosition(new Position(data.getHeroesPosition().x+heroesVX,data.getHeroesPosition().y+heroesVY));
-    //if (data.getHeroesPosition().x<0) data.setHeroesPosition(new Position(0,data.getHeroesPosition().y));
-    //etc...
+		data.setHeroesPosition(new Position(data.getHeroesPosition().x+heroesVX,data.getHeroesPosition().y+heroesVY));
+
+	  
+	  if (data.getHeroesPosition().x-(HardCodedParameters.heroesWidth/2)<0) data.setHeroesPosition(new Position((int)HardCodedParameters.heroesWidth/2,data.getHeroesPosition().y));
+	  if (data.getHeroesPosition().x+(HardCodedParameters.heroesWidth/2)>HardCodedParameters.maxX) data.setHeroesPosition(new Position((int)HardCodedParameters.maxX-(int)HardCodedParameters.heroesWidth/2,data.getHeroesPosition().y));
+	  if (data.getHeroesPosition().y-(HardCodedParameters.heroesHeight/2)<30) data.setHeroesPosition(new Position(data.getHeroesPosition().x,40));
+	  if (data.getHeroesPosition().y+(HardCodedParameters.heroesHeight/2)>HardCodedParameters.maxY*.8) data.setHeroesPosition(new Position(data.getHeroesPosition().x,(int)HardCodedParameters.maxY*.8-(int)HardCodedParameters.heroesHeight/2));
+
   }
 
   private void spawnPhantom(){
-    int x=(int)(HardCodedParameters.defaultWidth*.9);
+    int x=0;
     int y=0;
     boolean cont=true;
     while (cont) {
       y=(int)(gen.nextInt((int)(HardCodedParameters.defaultHeight*.6))+HardCodedParameters.defaultHeight*.1);
+      x=(int)(gen.nextInt((int)(HardCodedParameters.defaultWidth*.6))+HardCodedParameters.defaultWidth*.1);
+
       cont=false;
       for (PhantomService p:data.getPhantoms()){
         if (p.getPosition().equals(new Position(x,y))) cont=true;

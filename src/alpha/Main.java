@@ -70,20 +70,52 @@ public class Main extends Application{
     scene.setOnKeyPressed(new EventHandler<KeyEvent>(){
       @Override
         public void handle(KeyEvent event) {
-          if (event.getCode()==KeyCode.LEFT) engine.setHeroesCommand(User.COMMAND.LEFT);
-          if (event.getCode()==KeyCode.RIGHT) engine.setHeroesCommand(User.COMMAND.RIGHT);
-          if (event.getCode()==KeyCode.UP) engine.setHeroesCommand(User.COMMAND.UP);
-          if (event.getCode()==KeyCode.DOWN) engine.setHeroesCommand(User.COMMAND.DOWN);
+          if (event.getCode()==KeyCode.LEFT){
+            engine.setHeroesCommand(User.COMMAND.LEFT);  
+            viewer.setHeroesCommand(User.COMMAND.LEFT);
+
+          } 
+          if (event.getCode()==KeyCode.RIGHT){
+            engine.setHeroesCommand(User.COMMAND.RIGHT); 
+            viewer.setHeroesCommand(User.COMMAND.RIGHT);
+
+          }
+          if (event.getCode()==KeyCode.UP){
+            engine.setHeroesCommand(User.COMMAND.UP);  
+            viewer.setHeroesCommand(User.COMMAND.UP);
+
+          } 
+          if (event.getCode()==KeyCode.DOWN){
+            engine.setHeroesCommand(User.COMMAND.DOWN); 
+            viewer.setHeroesCommand(User.COMMAND.DOWN);
+
+          }
           event.consume();
         }
     });
     scene.setOnKeyReleased(new EventHandler<KeyEvent>(){
       @Override
         public void handle(KeyEvent event) {
-          if (event.getCode()==KeyCode.LEFT) engine.releaseHeroesCommand(User.COMMAND.LEFT);
-          if (event.getCode()==KeyCode.RIGHT) engine.releaseHeroesCommand(User.COMMAND.RIGHT);
-          if (event.getCode()==KeyCode.UP) engine.releaseHeroesCommand(User.COMMAND.UP);
-          if (event.getCode()==KeyCode.DOWN) engine.releaseHeroesCommand(User.COMMAND.DOWN);
+          if (event.getCode()==KeyCode.LEFT){
+            engine.releaseHeroesCommand(User.COMMAND.LEFT); 
+            viewer.releaseHeroesCommand(User.COMMAND.LEFT);
+
+          }
+          if (event.getCode()==KeyCode.RIGHT){
+            engine.releaseHeroesCommand(User.COMMAND.RIGHT); 
+            viewer.releaseHeroesCommand(User.COMMAND.RIGHT);
+
+          } 
+          if (event.getCode()==KeyCode.UP){
+            engine.releaseHeroesCommand(User.COMMAND.UP); 
+            viewer.releaseHeroesCommand(User.COMMAND.UP);
+
+          } 
+          if (event.getCode()==KeyCode.DOWN){
+            engine.releaseHeroesCommand(User.COMMAND.DOWN); 
+            viewer.releaseHeroesCommand(User.COMMAND.DOWN);
+
+          } 
           event.consume();
         }
     });

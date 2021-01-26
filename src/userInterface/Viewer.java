@@ -7,6 +7,8 @@
 package userInterface;
 
 import tools.HardCodedParameters;
+import tools.User;
+
 
 import specifications.ViewerService;
 import specifications.ReadService;
@@ -34,11 +36,19 @@ public class Viewer implements ViewerService, RequireReadService{
   private ReadService data;
   private ImageView heroesAvatar;
   private Image heroesSpriteSheet;
-  private ArrayList<Rectangle2D> heroesAvatarViewports;
+  private ArrayList<Circle> heroesAvatarViewports;
   private ArrayList<Integer> heroesAvatarXModifiers;
   private ArrayList<Integer> heroesAvatarYModifiers;
   private int heroesAvatarViewportIndex;
   private double xShrink,yShrink,shrink,xModifier,yModifier,heroesScale;
+  private boolean moveLeft,moveRight,moveUp,moveDown;
+  Image avatarRight=new Image("file:src/images/avatarRight.png");
+  Image avatarLeft=new Image("file:src/images/avatarLeft.png");
+  Image avatarUp=new Image("file:src/images/avatarUp.png");
+  Image avatarDown=new Image("file:src/images/avatarDown.png");
+
+  Image cyclope=new Image("file:src/images/cyclope.png");
+
 
   public Viewer(){}
   
@@ -47,17 +57,30 @@ public class Viewer implements ViewerService, RequireReadService{
     data=service;
   }
 
+
   @Override
   public void init(){
     xShrink=1;
     yShrink=1;
     xModifier=0;
     yModifier=0;
+    moveLeft = false;
+    moveRight = false;
+    moveUp = false;
+    moveDown = false;
 
     //Yucky hard-conding
-    heroesSpriteSheet = new Image("file:src/images/modern soldier large.png");
-    heroesAvatar = new ImageView(heroesSpriteSheet);
-    heroesAvatarViewports = new ArrayList<Rectangle2D>();
+ 
+
+    //heroesSpriteSheet =  cyclope;
+ 
+    heroesAvatar = new ImageView(cyclope);
+    //heroesAvatar = new Circle(20,  Color.rgb(255,238,0));
+    //heroesAvatar.setEffect(new Lighting());
+    heroesAvatar.setTranslateX(data.getHeroesPosition().x);
+    heroesAvatar.setTranslateY(data.getHeroesPosition().y);
+
+    heroesAvatarViewports = new ArrayList<Circle>();
     heroesAvatarXModifiers = new ArrayList<Integer>();
     heroesAvatarYModifiers = new ArrayList<Integer>();
 
@@ -65,15 +88,15 @@ public class Viewer implements ViewerService, RequireReadService{
     
     //TODO: replace the following with XML loader
     //heroesAvatarViewports.add(new Rectangle2D(301,386,95,192));
-    heroesAvatarViewports.add(new Rectangle2D(570,194,115,190));
+    /*heroesAvatarViewports.add(new Rectangle2D(570,194,115,190));
     heroesAvatarViewports.add(new Rectangle2D(398,386,133,192));
     heroesAvatarViewports.add(new Rectangle2D(155,194,147,190));
     heroesAvatarViewports.add(new Rectangle2D(785,386,127,194));
     heroesAvatarViewports.add(new Rectangle2D(127,582,135,198));
     heroesAvatarViewports.add(new Rectangle2D(264,582,111,200));
     heroesAvatarViewports.add(new Rectangle2D(2,582,123,198));
-    heroesAvatarViewports.add(new Rectangle2D(533,386,115,192));
-    //heroesAvatarViewports.add(new Rectangle2D(204,386,95,192));
+    heroesAvatarViewports.add(new Rectangle2D(533,386,115,192));*/
+    heroesAvatarViewports.add(new Circle(20,  Color.rgb(255,238,0)));
 
     //heroesAvatarXModifiers.add(10);heroesAvatarYModifiers.add(-7);
     heroesAvatarXModifiers.add(6);heroesAvatarYModifiers.add(-6);
@@ -90,6 +113,29 @@ public class Viewer implements ViewerService, RequireReadService{
 
   @Override
   public Parent getPanel(){
+	  
+	
+
+
+    if(moveLeft ){
+        heroesAvatar = new ImageView(avatarLeft);
+
+    }
+     
+    if(moveRight ){
+        heroesAvatar = new ImageView(avatarRight);
+
+    }
+    
+    if(moveUp ){
+        heroesAvatar = new ImageView(avatarUp);
+
+    } 
+    if(moveDown ){
+        heroesAvatar = new ImageView(avatarDown);
+
+    }
+
     shrink=Math.min(xShrink,yShrink);
     xModifier=.01*shrink*defaultMainHeight;
     yModifier=.01*shrink*defaultMainHeight;
@@ -116,18 +162,18 @@ public class Viewer implements ViewerService, RequireReadService{
     score.setFont(new Font(.05*shrink*defaultMainHeight));
     
     int index=heroesAvatarViewportIndex/spriteSlowDownRate;
-    heroesScale=data.getHeroesHeight()*shrink/heroesAvatarViewports.get(index).getHeight();
-    heroesAvatar.setViewport(heroesAvatarViewports.get(index));
+    heroesScale=data.getHeroesHeight()*shrink/heroesAvatarViewports.get(index).getRadius();
+    //heroesAvatar.setViewport(heroesAvatarViewports.get(index));
     heroesAvatar.setFitHeight(data.getHeroesHeight()*shrink);
     heroesAvatar.setPreserveRatio(true);
     heroesAvatar.setTranslateX(shrink*data.getHeroesPosition().x+
                                shrink*xModifier+
-                               -heroesScale*0.5*heroesAvatarViewports.get(index).getWidth()+
+                               -heroesScale*0.5*heroesAvatarViewports.get(index).getRadius()+
                                shrink*heroesScale*heroesAvatarXModifiers.get(index)
                               );
     heroesAvatar.setTranslateY(shrink*data.getHeroesPosition().y+
                                shrink*yModifier+
-                               -heroesScale*0.5*heroesAvatarViewports.get(index).getHeight()+
+                               -heroesScale*0.5*heroesAvatarViewports.get(index).getRadius()+
                                shrink*heroesScale*heroesAvatarYModifiers.get(index)
                               );
     heroesAvatarViewportIndex=(heroesAvatarViewportIndex+1)%(heroesAvatarViewports.size()*spriteSlowDownRate);
@@ -160,4 +206,23 @@ public class Viewer implements ViewerService, RequireReadService{
   public void setMainWindowHeight(double height){
     yShrink=height/defaultMainHeight;
   }
+
+
+  @Override
+  public void setHeroesCommand(User.COMMAND c){
+    if (c==User.COMMAND.LEFT) moveLeft=true;
+    if (c==User.COMMAND.RIGHT) moveRight=true;
+    if (c==User.COMMAND.UP) moveUp=true;
+    if (c==User.COMMAND.DOWN) moveDown=true;
+  }
+  
+  @Override
+  public void releaseHeroesCommand(User.COMMAND c){
+    if (c==User.COMMAND.LEFT) moveLeft=false;
+    if (c==User.COMMAND.RIGHT) moveRight=false;
+    if (c==User.COMMAND.UP) moveUp=false;
+    if (c==User.COMMAND.DOWN) moveDown=false;
+  }
+
+  
 }
