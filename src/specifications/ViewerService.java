@@ -7,10 +7,16 @@
 package specifications;
 
 import javafx.scene.Parent;
+import tools.User;
+
 
 public interface ViewerService{
   public void init();
   public Parent getPanel();
   public void setMainWindowWidth(double w);
   public void setMainWindowHeight(double h);
+  public void setHeroesCommand(User.COMMAND c);
+  public void releaseHeroesCommand(User.COMMAND c);
+
+
 }

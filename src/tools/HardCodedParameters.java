@@ -9,12 +9,13 @@ package tools;
 public class HardCodedParameters {
   //---HARD-CODED-PARAMETERS---//
   public static String defaultParamFileName = "in.parameters";
+
   public static final int defaultWidth = 800, defaultHeight = 600,
-                          heroesStartX = 80, heroesStartY = 200, heroesWidth=60, heroesHeight=90, heroesStep = 10,
+                          heroesStartX = 80, heroesStartY = 200, heroesWidth=80, heroesHeight=80, heroesStep = 10,
                           phantomWidth = 30, phantomHeight = 30, phantomStep = 10;
-  public static final int enginePaceMillis = 100,
+  public static final int enginePaceMillis = 40, //vitesse a laquelle l'image se màj (plus petit tout se deplace plus vite)
                           spriteSlowDownRate = 7;
-  public static final double friction = 0.50;
+  public static final double friction = 0.10;// valeur plus grande => pacman prends plus de temps a atteindre sa vitesse max
   public static final double resolutionShrinkFactor = 0.95,
                              userBarShrinkFactor = 0.25,
                              menuBarShrinkFactor = 0.5,
@@ -27,6 +28,10 @@ public class HardCodedParameters {
                           displayZoneXZoomStep = 5,
                           displayZoneYZoomStep = 5;
   public static final double displayZoneAlphaZoomStep = 0.98;
+  public static final int minX = 0, maxX = defaultWidth, minY =100, maxY = defaultHeight+40;
+
+
+
 
   //---MISCELLANOUS---//
   public static final Object loadingLock = new Object();
