@@ -2,3 +2,4 @@ beans/*
 init.sh
 src/images/.DS_Store
 bin/*
+META-INF/*
