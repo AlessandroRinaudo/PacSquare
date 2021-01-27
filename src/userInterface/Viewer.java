@@ -37,6 +37,7 @@ public class Viewer implements ViewerService, RequireReadService{
                               defaultMainHeight=HardCodedParameters.defaultHeight;
   private ReadService data;
   private ImageView heroesAvatar;
+  
   private Image heroesSpriteSheet;
   private ArrayList<Rectangle> heroesAvatarViewports;
   private ArrayList<Integer> heroesAvatarXModifiers;
@@ -145,8 +146,8 @@ public class Viewer implements ViewerService, RequireReadService{
     //Yucky hard-conding
     Rectangle map = new Rectangle(-2*xModifier+shrink*defaultMainWidth,
                                   -.2*shrink*defaultMainHeight+shrink*defaultMainHeight);
-    map.setFill(Color.BLUE);
-    map.setStroke(Color.WHITE);
+    map.setFill(Color.BLACK);
+    map.setStroke(Color.YELLOW);
     map.setStrokeWidth(.01*shrink*defaultMainHeight);
     map.setArcWidth(.04*shrink*defaultMainHeight);
     map.setArcHeight(.04*shrink*defaultMainHeight);
@@ -189,10 +190,10 @@ public class Viewer implements ViewerService, RequireReadService{
     for (int i=0; i<phantoms.size();i++){
       p=phantoms.get(i);
       double radius=.5*Math.min(shrink*data.getPhantomWidth(),shrink*data.getPhantomHeight());
-      Circle phantomAvatar = new Circle(radius,Color.BLACK);
+      Circle phantomAvatar = new Circle(radius+12,Color.PINK);
       phantomAvatar.setEffect(new Lighting());
       phantomAvatar.setTranslateX(shrink*p.getPosition().x+shrink*xModifier-radius);
-      phantomAvatar.setTranslateY(shrink*p.getPosition().y+shrink*yModifier-radius);
+      phantomAvatar.setTranslateY(shrink*p.getPosition().y+shrink*yModifier-radius+2);
       panel.getChildren().add(phantomAvatar);
       
     }
@@ -206,9 +207,9 @@ public class Viewer implements ViewerService, RequireReadService{
       f=fruits.get(j);
       double radius=.5*Math.min(shrink*data.getPhantomWidth(),shrink*data.getPhantomHeight());
 
-      Circle fruitAvatar = new Circle(radius+1,Color.rgb(255,156,156));
+      Circle fruitAvatar = new Circle(radius+1,Color.YELLOW);
       fruitAvatar.setEffect(new Lighting());
-      fruitAvatar.setTranslateX(shrink*f.getPosition().x+shrink*xModifier-radius+15);
+      fruitAvatar.setTranslateX(shrink*f.getPosition().x+shrink*xModifier-radius+13);
       fruitAvatar.setTranslateY(shrink*f.getPosition().y+shrink*yModifier-radius+15);
       panel.getChildren().add(fruitAvatar);
     }
