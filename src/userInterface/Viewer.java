@@ -71,15 +71,7 @@ public class Viewer implements ViewerService, RequireReadService{
     moveRight = false;
     moveUp = false;
     moveDown = false;
-
-    //Yucky hard-conding
- 
-
-    //heroesSpriteSheet =  cyclope;
- 
     heroesAvatar = new ImageView(cyclope);
-    //heroesAvatar = new Circle(20,  Color.rgb(255,238,0));
-    //heroesAvatar.setEffect(new Lighting());
     heroesAvatar.setTranslateX(data.getHeroesPosition().x);
     heroesAvatar.setTranslateY(data.getHeroesPosition().y);
 
@@ -88,30 +80,9 @@ public class Viewer implements ViewerService, RequireReadService{
     heroesAvatarYModifiers = new ArrayList<Integer>();
 
     heroesAvatarViewportIndex=0;
-    
-    //TODO: replace the following with XML loader
-    //heroesAvatarViewports.add(new Rectangle2D(301,386,95,192));
-    /*heroesAvatarViewports.add(new Rectangle2D(570,194,115,190));
-    heroesAvatarViewports.add(new Rectangle2D(398,386,133,192));
-    heroesAvatarViewports.add(new Rectangle2D(155,194,147,190));
-    heroesAvatarViewports.add(new Rectangle2D(785,386,127,194));
-    heroesAvatarViewports.add(new Rectangle2D(127,582,135,198));
-    heroesAvatarViewports.add(new Rectangle2D(264,582,111,200));
-    heroesAvatarViewports.add(new Rectangle2D(2,582,123,198));
-    heroesAvatarViewports.add(new Rectangle2D(533,386,115,192));*/
     heroesAvatarViewports.add(new Rectangle(HardCodedParameters.heroesHeight,HardCodedParameters.heroesWidth,  Color.rgb(255,238,0)));
 
     heroesAvatarXModifiers.add(0);heroesAvatarYModifiers.add(0);
-   /* heroesAvatarXModifiers.add(6);heroesAvatarYModifiers.add(-6);
-    heroesAvatarXModifiers.add(2);heroesAvatarYModifiers.add(-8);
-    heroesAvatarXModifiers.add(1);heroesAvatarYModifiers.add(-10);
-    heroesAvatarXModifiers.add(1);heroesAvatarYModifiers.add(-13);
-    heroesAvatarXModifiers.add(5);heroesAvatarYModifiers.add(-15);
-    heroesAvatarXModifiers.add(5);heroesAvatarYModifiers.add(-13);
-    heroesAvatarXModifiers.add(0);heroesAvatarYModifiers.add(-9);
-    heroesAvatarXModifiers.add(0);heroesAvatarYModifiers.add(-6);*/
-    //heroesAvatarXModifiers.add(10);heroesAvatarYModifiers.add(-7);
-    
   }
 
   @Override
@@ -190,7 +161,7 @@ public class Viewer implements ViewerService, RequireReadService{
     for (int i=0; i<phantoms.size();i++){
       p=phantoms.get(i);
       double radius=.5*Math.min(shrink*data.getPhantomWidth(),shrink*data.getPhantomHeight());
-      Circle phantomAvatar = new Circle(radius+12,Color.PINK);
+      Circle phantomAvatar = new Circle(radius+12,Color.RED);
       phantomAvatar.setEffect(new Lighting());
       phantomAvatar.setTranslateX(shrink*p.getPosition().x+shrink*xModifier-radius);
       phantomAvatar.setTranslateY(shrink*p.getPosition().y+shrink*yModifier-radius+2);
