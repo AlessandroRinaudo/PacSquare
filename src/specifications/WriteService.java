@@ -16,6 +16,8 @@ public interface WriteService {
   public void setStepNumber(int n);
   public void addFruit(Position p);
   public void setFruits(ArrayList<FruitService> fruits);
+  public void addPhantom(Position p);
+  public void setPhantoms(ArrayList<PhantomService> phantoms);
   public void setSoundEffect(Sound.SOUND s);
   public void addScore(int score);
 }

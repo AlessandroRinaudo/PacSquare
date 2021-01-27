@@ -14,6 +14,8 @@ import specifications.ViewerService;
 import specifications.ReadService;
 import specifications.RequireReadService;
 import specifications.FruitService;
+import specifications.PhantomService;
+
 
 import javafx.scene.Group;
 import javafx.scene.Parent;
@@ -143,8 +145,8 @@ public class Viewer implements ViewerService, RequireReadService{
     //Yucky hard-conding
     Rectangle map = new Rectangle(-2*xModifier+shrink*defaultMainWidth,
                                   -.2*shrink*defaultMainHeight+shrink*defaultMainHeight);
-    map.setFill(Color.WHITE);
-    map.setStroke(Color.DIMGRAY);
+    map.setFill(Color.BLUE);
+    map.setStroke(Color.WHITE);
     map.setStrokeWidth(.01*shrink*defaultMainHeight);
     map.setArcWidth(.04*shrink*defaultMainHeight);
     map.setArcHeight(.04*shrink*defaultMainHeight);
@@ -153,7 +155,7 @@ public class Viewer implements ViewerService, RequireReadService{
     
     Text greets = new Text(-0.1*shrink*defaultMainHeight+.5*shrink*defaultMainWidth,
                            -0.1*shrink*defaultMainWidth+shrink*defaultMainHeight,
-                           "Round 1");
+                           "PacSquare");
     greets.setFont(new Font(.05*shrink*defaultMainHeight));
     
     Text score = new Text(-0.1*shrink*defaultMainHeight+.5*shrink*defaultMainWidth,
@@ -168,12 +170,12 @@ public class Viewer implements ViewerService, RequireReadService{
     heroesAvatar.setPreserveRatio(true);
     heroesAvatar.setTranslateX(shrink*data.getHeroesPosition().x+
                                shrink*xModifier+
-                               -heroesScale*0.5*heroesAvatarViewports.get(index).getWidth()+
+                               -heroesScale*0.5*heroesAvatarViewports.get(index).getHeight()+
                                shrink*heroesScale*heroesAvatarXModifiers.get(index)
                               );
     heroesAvatar.setTranslateY(shrink*data.getHeroesPosition().y+
                                shrink*yModifier+
-                               -heroesScale*0.5*heroesAvatarViewports.get(index).getHeight()+
+                               -heroesScale*0.5*heroesAvatarViewports.get(index).getWidth()+
                                shrink*heroesScale*heroesAvatarYModifiers.get(index)
                               );
     heroesAvatarViewportIndex=(heroesAvatarViewportIndex+1)%(heroesAvatarViewports.size()*spriteSlowDownRate);
@@ -181,20 +183,38 @@ public class Viewer implements ViewerService, RequireReadService{
     Group panel = new Group();
     panel.getChildren().addAll(map,greets,score,heroesAvatar);
 
-    ArrayList<FruitService> fruits = data.getFruits();
-    FruitService p;
+    ArrayList<PhantomService> phantoms = data.getPhantoms();
+    PhantomService p;
 
-    for (int i=0; i<fruits.size();i++){
-      p=fruits.get(i);
-      double radius=.5*Math.min(shrink*data.getFruitWidth(),shrink*data.getFruitHeight());
+    for (int i=0; i<phantoms.size();i++){
+      p=phantoms.get(i);
+      double radius=.5*Math.min(shrink*data.getPhantomWidth(),shrink*data.getPhantomHeight());
+      Circle phantomAvatar = new Circle(radius,Color.BLACK);
+      phantomAvatar.setEffect(new Lighting());
+      phantomAvatar.setTranslateX(shrink*p.getPosition().x+shrink*xModifier-radius);
+      phantomAvatar.setTranslateY(shrink*p.getPosition().y+shrink*yModifier-radius);
+      panel.getChildren().add(phantomAvatar);
+      
+    }
+    
+
+    ArrayList<FruitService> fruits = data.getFruits();    
+    FruitService f;
+
+
+    for (int j=0; j<fruits.size();j++){
+      f=fruits.get(j);
+      double radius=.5*Math.min(shrink*data.getPhantomWidth(),shrink*data.getPhantomHeight());
+
       Circle fruitAvatar = new Circle(radius+1,Color.rgb(255,156,156));
       fruitAvatar.setEffect(new Lighting());
-      fruitAvatar.setTranslateX(shrink*p.getPosition().x+shrink*xModifier-radius+15);
-      fruitAvatar.setTranslateY(shrink*p.getPosition().y+shrink*yModifier-radius+15);
+      fruitAvatar.setTranslateX(shrink*f.getPosition().x+shrink*xModifier-radius+15);
+      fruitAvatar.setTranslateY(shrink*f.getPosition().y+shrink*yModifier-radius+15);
       panel.getChildren().add(fruitAvatar);
     }
 
     return panel;
+  
   }
 
   @Override

@@ -16,6 +16,8 @@ import specifications.EngineService;
 import specifications.DataService;
 import specifications.RequireDataService;
 import specifications.FruitService;
+import specifications.PhantomService;
+
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -57,47 +59,58 @@ public class Engine implements EngineService, RequireDataService{
   @Override
   public void start(){
     engineClock.schedule(new TimerTask(){
+      boolean rep = true;
       public void run() {
         System.out.println(data.getHeroesPosition().x);
         //System.out.println("Game step #"+data.getStepNumber()+": checked.");
         
+        
+        if (gen.nextInt(10)<0.01 && data.getPhantoms().size()<5) spawnPhantom();
         if (gen.nextInt(10)<0.01 && data.getFruits().size()<5) spawnFruit();
 
         updateSpeedHeroes();
         updateCommandHeroes();
         updatePositionHeroes();
-
-        ArrayList<FruitService> fruits = new ArrayList<FruitService>();
+      if(rep){
+          try{
+            Thread.sleep(1000);
+            rep=false;
+          } catch (InterruptedException ex){
+            Thread.currentThread().interrupt();
+          }
+      }
+      
+      /*
+        ArrayList<PhantomService> phantoms = new ArrayList<PhantomService>();
         int score=0;
 
         data.setSoundEffect(Sound.SOUND.None);
-        /*
-        if (ding()) {
-        	if (collisionHeroesPhantom(p)){
-                data.setSoundEffect(Sound.SOUND.HeroesGotHit);
-                score++;
-              } else {
-                if (p.getPosition().x>0) phantoms.add(p);
-              }
-        }
-        */
         
+        for (PhantomService p:data.getPhantoms()){
+          if (p.getAction()==PhantomService.MOVE.LEFT) moveLeft(p);
+
+          if (collisionHeroesPhantom(p)){
+            // data.setSoundEffect(Sound.SOUND.HeroesGotHit);
+            // score++;
+            stop();
+          }
+        }*/
+        ArrayList<FruitService> fruits = new ArrayList<FruitService>();
+      
+        data.setSoundEffect(Sound.SOUND.None);
         
+        int score=0;
 
-        for (FruitService p:data.getFruits()){
-       /*   if (p.getAction()==PhantomService.MOVE.LEFT) moveLeft(p);
-          if (p.getAction()==PhantomService.MOVE.RIGHT) moveRight(p);
-          if (p.getAction()==PhantomService.MOVE.UP) moveUp(p);
-          if (p.getAction()==PhantomService.MOVE.DOWN) moveDown(p);*/
 
-          if (collisionHeroesFruit(p)){
+        for (FruitService f:data.getFruits()){
+    
+          if (collisionHeroesFruit(f)){
             data.setSoundEffect(Sound.SOUND.HeroesGotHit);
             score++;
           } else {
-            if (p.getPosition().x>0) fruits.add(p);
+            if (f.getPosition().x>0) fruits.add(f);
           }
         }
-
         data.addScore(score);
 
         data.setFruits(fruits);
@@ -134,17 +147,7 @@ public class Engine implements EngineService, RequireDataService{
   }
 
   private void updateCommandHeroes(){
-   /* double xShrink=1;
-    double yShrink=1;
-    double shrink=Math.min(xShrink,yShrink);
-    double xModifier=.01*shrink*HardCodedParameters.defaultWidth;
-    double yModifier=.01*shrink*HardCodedParameters.defaultHeight;
-    xModifier=-2*xModifier+shrink*HardCodedParameters.defaultWidth;
-    yModifier=-.2*shrink*HardCodedParameters.defaultHeight+shrink*HardCodedParameters.defaultHeight;
-    if (moveLeft && data.getHeroesPosition().x >= 45) heroesVX-=heroesStep;
-    if (moveRight &&  data.getHeroesPosition().x <= xModifier*0.95) heroesVX+=heroesStep;
-    if (moveUp && data.getHeroesPosition().y >= 80) heroesVY-=heroesStep;
-    if (moveDown && data.getHeroesPosition().y <= yModifier*0.85) heroesVY+=heroesStep;*/
+
 	    if (moveLeft) heroesVX-=heroesStep;
 	    if (moveRight) heroesVX+=heroesStep;
 	    if (moveUp) heroesVY-=heroesStep;
@@ -155,12 +158,27 @@ public class Engine implements EngineService, RequireDataService{
 		data.setHeroesPosition(new Position(data.getHeroesPosition().x+heroesVX,data.getHeroesPosition().y+heroesVY));
 
 	  
-	  if (data.getHeroesPosition().x-(HardCodedParameters.heroesWidth/(double)3)<0) data.setHeroesPosition(new Position((int)HardCodedParameters.heroesWidth/3,data.getHeroesPosition().y));
-	  if (data.getHeroesPosition().x+(HardCodedParameters.heroesWidth/(double)2)>HardCodedParameters.maxX) data.setHeroesPosition(new Position((int)HardCodedParameters.maxX-(int)HardCodedParameters.heroesWidth/(double)2,data.getHeroesPosition().y));
-	  if (data.getHeroesPosition().y-(HardCodedParameters.heroesHeight/(double)3)<0) data.setHeroesPosition(new Position(data.getHeroesPosition().x,(int)HardCodedParameters.heroesHeight/(double)3));
-	  if (data.getHeroesPosition().y+(HardCodedParameters.heroesHeight/(double)3)>HardCodedParameters.maxY*.8) data.setHeroesPosition(new Position(data.getHeroesPosition().x,(int)HardCodedParameters.maxY*.8-(int)HardCodedParameters.heroesHeight/(double)3));
-
+		  if (data.getHeroesPosition().x-(HardCodedParameters.heroesWidth/(double)3)<0) data.setHeroesPosition(new Position((int)HardCodedParameters.heroesWidth/3,data.getHeroesPosition().y));
+		  if (data.getHeroesPosition().x+(HardCodedParameters.heroesWidth/(double)2)>HardCodedParameters.maxX) data.setHeroesPosition(new Position((int)HardCodedParameters.maxX-(int)HardCodedParameters.heroesWidth/(double)2,data.getHeroesPosition().y));
+		  if (data.getHeroesPosition().y-(HardCodedParameters.heroesHeight/(double)3)<0) data.setHeroesPosition(new Position(data.getHeroesPosition().x,(int)HardCodedParameters.heroesHeight/(double)3));
+		  if (data.getHeroesPosition().y+(HardCodedParameters.heroesHeight/(double)3)>HardCodedParameters.maxY*.8) data.setHeroesPosition(new Position(data.getHeroesPosition().x,(int)HardCodedParameters.maxY*.8-(int)HardCodedParameters.heroesHeight/(double)3));
+		  
   }
+  private void spawnPhantom(){
+	  int x=0;
+	  int y=0;
+	  boolean cont=true;
+	  while (cont) {
+		  y=(int)(gen.nextInt((int)(HardCodedParameters.defaultHeight*.6))+HardCodedParameters.defaultHeight*.1);
+		  x=(int)(gen.nextInt((int)(HardCodedParameters.defaultWidth*.6))+HardCodedParameters.defaultWidth*.1);
+
+		  cont=false;
+		  for (PhantomService p:data.getPhantoms()){
+			  if (p.getPosition().equals(new Position(x,y))) cont=true;
+			  }
+		  }
+	  data.addPhantom(new Position(x,y));
+	  }
 
   private void spawnFruit(){
     int x=0;
