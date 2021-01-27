@@ -14,8 +14,8 @@ import java.util.ArrayList;
 public interface WriteService {
   public void setHeroesPosition(Position p);
   public void setStepNumber(int n);
-  public void addPhantom(Position p);
-  public void setPhantoms(ArrayList<PhantomService> phantoms);
+  public void addFruit(Position p);
+  public void setFruits(ArrayList<FruitService> fruits);
   public void setSoundEffect(Sound.SOUND s);
   public void addScore(int score);
 }

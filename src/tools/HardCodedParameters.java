@@ -12,8 +12,8 @@ public class HardCodedParameters {
 
   public static final int defaultWidth = 800, defaultHeight = 600,
                           heroesStartX = 80, heroesStartY = 200, heroesWidth=80, heroesHeight=80, heroesStep = 10,
-                          phantomWidth = 30, phantomHeight = 30, phantomStep = 10;
-  public static final int enginePaceMillis = 40, //vitesse a laquelle l'image se màj (plus petit tout se deplace plus vite)
+                          fruitWidth = 30, fruitHeight = 30, fruitStep = 10;
+  public static final int enginePaceMillis = 40, //vitesse a laquelle l'image se maj (plus petit tout se deplace plus vite)
                           spriteSlowDownRate = 7;
   public static final double friction = 0.10;// valeur plus grande => pacman prends plus de temps a atteindre sa vitesse max
   public static final double resolutionShrinkFactor = 0.95,
@@ -28,7 +28,7 @@ public class HardCodedParameters {
                           displayZoneXZoomStep = 5,
                           displayZoneYZoomStep = 5;
   public static final double displayZoneAlphaZoomStep = 0.98;
-  public static final int minX = 0, maxX = defaultWidth, minY =100, maxY = defaultHeight+40;
+  public static final int minX = 0, maxX = defaultWidth, minY =0, maxY = defaultHeight;
 
 
 

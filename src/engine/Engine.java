@@ -15,7 +15,7 @@ import tools.Sound;
 import specifications.EngineService;
 import specifications.DataService;
 import specifications.RequireDataService;
-import specifications.PhantomService;
+import specifications.FruitService;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -25,7 +25,7 @@ import java.util.ArrayList;
 public class Engine implements EngineService, RequireDataService{
   private static final double friction=HardCodedParameters.friction,
                               heroesStep=HardCodedParameters.heroesStep,
-                              phantomStep=HardCodedParameters.phantomStep;
+                              fruitStep=HardCodedParameters.fruitStep;
   private Timer engineClock;
   private DataService data;
   private User.COMMAND command;
@@ -37,7 +37,8 @@ public class Engine implements EngineService, RequireDataService{
 
   @Override
   public void bindDataService(DataService service){
-    data=service;
+    data=service; //hellooo
+    
   }
   
   @Override
@@ -60,13 +61,13 @@ public class Engine implements EngineService, RequireDataService{
         System.out.println(data.getHeroesPosition().x);
         //System.out.println("Game step #"+data.getStepNumber()+": checked.");
         
-        if (gen.nextInt(10)<0.01 && data.getPhantoms().size()<5) spawnPhantom();
+        if (gen.nextInt(10)<0.01 && data.getFruits().size()<5) spawnFruit();
 
         updateSpeedHeroes();
         updateCommandHeroes();
         updatePositionHeroes();
 
-        ArrayList<PhantomService> phantoms = new ArrayList<PhantomService>();
+        ArrayList<FruitService> fruits = new ArrayList<FruitService>();
         int score=0;
 
         data.setSoundEffect(Sound.SOUND.None);
@@ -83,23 +84,23 @@ public class Engine implements EngineService, RequireDataService{
         
         
 
-        for (PhantomService p:data.getPhantoms()){
+        for (FruitService p:data.getFruits()){
        /*   if (p.getAction()==PhantomService.MOVE.LEFT) moveLeft(p);
           if (p.getAction()==PhantomService.MOVE.RIGHT) moveRight(p);
           if (p.getAction()==PhantomService.MOVE.UP) moveUp(p);
           if (p.getAction()==PhantomService.MOVE.DOWN) moveDown(p);*/
 
-          if (collisionHeroesPhantom(p)){
+          if (collisionHeroesFruit(p)){
             data.setSoundEffect(Sound.SOUND.HeroesGotHit);
             score++;
           } else {
-            if (p.getPosition().x>0) phantoms.add(p);
+            if (p.getPosition().x>0) fruits.add(p);
           }
         }
 
         data.addScore(score);
 
-        data.setPhantoms(phantoms);
+        data.setFruits(fruits);
 
         data.setStepNumber(data.getStepNumber()+1);
       }
@@ -154,14 +155,14 @@ public class Engine implements EngineService, RequireDataService{
 		data.setHeroesPosition(new Position(data.getHeroesPosition().x+heroesVX,data.getHeroesPosition().y+heroesVY));
 
 	  
-	  if (data.getHeroesPosition().x-(HardCodedParameters.heroesWidth/2)<0) data.setHeroesPosition(new Position((int)HardCodedParameters.heroesWidth/2,data.getHeroesPosition().y));
-	  if (data.getHeroesPosition().x+(HardCodedParameters.heroesWidth/2)>HardCodedParameters.maxX) data.setHeroesPosition(new Position((int)HardCodedParameters.maxX-(int)HardCodedParameters.heroesWidth/2,data.getHeroesPosition().y));
-	  if (data.getHeroesPosition().y-(HardCodedParameters.heroesHeight/2)<30) data.setHeroesPosition(new Position(data.getHeroesPosition().x,40));
-	  if (data.getHeroesPosition().y+(HardCodedParameters.heroesHeight/2)>HardCodedParameters.maxY*.8) data.setHeroesPosition(new Position(data.getHeroesPosition().x,(int)HardCodedParameters.maxY*.8-(int)HardCodedParameters.heroesHeight/2));
+	  if (data.getHeroesPosition().x-(HardCodedParameters.heroesWidth/(double)3)<0) data.setHeroesPosition(new Position((int)HardCodedParameters.heroesWidth/3,data.getHeroesPosition().y));
+	  if (data.getHeroesPosition().x+(HardCodedParameters.heroesWidth/(double)2)>HardCodedParameters.maxX) data.setHeroesPosition(new Position((int)HardCodedParameters.maxX-(int)HardCodedParameters.heroesWidth/(double)2,data.getHeroesPosition().y));
+	  if (data.getHeroesPosition().y-(HardCodedParameters.heroesHeight/(double)3)<0) data.setHeroesPosition(new Position(data.getHeroesPosition().x,(int)HardCodedParameters.heroesHeight/(double)3));
+	  if (data.getHeroesPosition().y+(HardCodedParameters.heroesHeight/(double)3)>HardCodedParameters.maxY*.8) data.setHeroesPosition(new Position(data.getHeroesPosition().x,(int)HardCodedParameters.maxY*.8-(int)HardCodedParameters.heroesHeight/(double)3));
 
   }
 
-  private void spawnPhantom(){
+  private void spawnFruit(){
     int x=0;
     int y=0;
     boolean cont=true;
@@ -170,43 +171,46 @@ public class Engine implements EngineService, RequireDataService{
       x=(int)(gen.nextInt((int)(HardCodedParameters.defaultWidth*.6))+HardCodedParameters.defaultWidth*.1);
 
       cont=false;
-      for (PhantomService p:data.getPhantoms()){
+      for (FruitService p:data.getFruits()){
         if (p.getPosition().equals(new Position(x,y))) cont=true;
       }
     }
-    data.addPhantom(new Position(x,y));
+    data.addFruit(new Position(x,y));
   }
 
-  private void moveLeft(PhantomService p){
-    p.setPosition(new Position(p.getPosition().x-phantomStep,p.getPosition().y));
+  private void moveLeft(FruitService p){
+    p.setPosition(new Position(p.getPosition().x-fruitStep,p.getPosition().y));
   }
 
-  private void moveRight(PhantomService p){
+  private void moveRight(FruitService p){
     if(data.getHeroesPosition().x <= 95) {
-      p.setPosition(new Position(p.getPosition().x + phantomStep, p.getPosition().y));
+      p.setPosition(new Position(p.getPosition().x + fruitStep, p.getPosition().y));
     }
     else{ }
   }
 
-  private void moveUp(PhantomService p){
-    p.setPosition(new Position(p.getPosition().x,p.getPosition().y-phantomStep));
+  private void moveUp(FruitService p){
+    p.setPosition(new Position(p.getPosition().x,p.getPosition().y-fruitStep));
   }
 
-  private void moveDown(PhantomService p){
+  private void moveDown(FruitService p){
     if(HardCodedParameters.defaultHeight > p.getPosition().y) {
-      p.setPosition(new Position(p.getPosition().x, p.getPosition().y + phantomStep));
+      p.setPosition(new Position(p.getPosition().x, p.getPosition().y + fruitStep));
     }
   }
 
-  private boolean collisionHeroesPhantom(PhantomService p){
-    return (
+  private boolean collisionHeroesFruit(FruitService p){
+   return (
       (data.getHeroesPosition().x-p.getPosition().x)*(data.getHeroesPosition().x-p.getPosition().x)+
       (data.getHeroesPosition().y-p.getPosition().y)*(data.getHeroesPosition().y-p.getPosition().y) <
-      0.25*(data.getHeroesWidth()+data.getPhantomWidth())*(data.getHeroesWidth()+data.getPhantomWidth())
+      (data.getHeroesWidth()*.33+data.getFruitWidth())*(data.getHeroesWidth()*.33+data.getFruitWidth())
     );
+    
+	
+			
   }
   
-  private boolean collisionHeroesPhantoms(){
-    for (PhantomService p:data.getPhantoms()) if (collisionHeroesPhantom(p)) return true; return false;
+  private boolean collisionHeroesFruits(){
+    for (FruitService p:data.getFruits()) if (collisionHeroesFruit(p)) return true; return false;
   }
 }

@@ -11,9 +11,9 @@ import tools.Position;
 import tools.Sound;
 
 import specifications.DataService;
-import specifications.PhantomService;
+import specifications.FruitService;
 
-import data.ia.MoveLeftPhantom;
+import data.ia.Fruit;
 
 import java.util.ArrayList;
 
@@ -21,11 +21,10 @@ public class Data implements DataService{
   //private Heroes hercules;
   private Position heroesPosition;
   private int stepNumber, score;
-  private ArrayList<PhantomService> phantoms;
-  private double heroesWidth,heroesHeight,phantomWidth,phantomHeight;
+  private ArrayList<FruitService> fruits;
+  private double heroesWidth,heroesHeight,fruitWidth,fruitHeight;
   private Sound.SOUND sound;
   double minX,maxX,minY,maxY;
-  ArrayList<Position> fruits;
 
 
   
@@ -36,13 +35,13 @@ public class Data implements DataService{
   public void init(){
     //hercules = new Heroes;
     heroesPosition = new Position(HardCodedParameters.heroesStartX,HardCodedParameters.heroesStartY);
-    phantoms = new ArrayList<PhantomService>();
+    fruits = new ArrayList<FruitService>();
     stepNumber = 0;
     score = 0;
     heroesWidth = HardCodedParameters.heroesWidth;
     heroesHeight = HardCodedParameters.heroesHeight;
-    phantomWidth = HardCodedParameters.phantomWidth;
-    phantomHeight = HardCodedParameters.phantomHeight;
+    fruitWidth = HardCodedParameters.fruitWidth;
+    fruitHeight = HardCodedParameters.fruitHeight;
     sound = Sound.SOUND.None;
     minX = HardCodedParameters.minX;
     maxX = HardCodedParameters.maxX;
@@ -62,10 +61,10 @@ public class Data implements DataService{
   public double getHeroesHeight(){ return heroesHeight; }
   
   @Override
-  public double getPhantomWidth(){ return phantomWidth; }
+  public double getFruitWidth(){ return fruitWidth; }
   
   @Override
-  public double getPhantomHeight(){ return phantomHeight; }
+  public double getFruitHeight(){ return fruitHeight; }
 
   @Override
   public int getStepNumber(){ return stepNumber; }
@@ -74,7 +73,7 @@ public class Data implements DataService{
   public int getScore(){ return score; }
 
   @Override
-  public ArrayList<PhantomService> getPhantoms(){ return phantoms; }
+  public ArrayList<FruitService> getFruits(){ return fruits; }
   
   @Override
   public Sound.SOUND getSoundEffect() { return sound; }
@@ -89,10 +88,10 @@ public class Data implements DataService{
   public void addScore(int score){ this.score+=score; }
 
   @Override
-  public void addPhantom(Position p) { phantoms.add(new MoveLeftPhantom(p)); }
+  public void addFruit(Position p) { fruits.add(new Fruit(p)); }
   
   @Override
-  public void setPhantoms(ArrayList<PhantomService> phantoms) { this.phantoms=phantoms; }
+  public void setFruits(ArrayList<FruitService> fruits) { this.fruits=fruits; }
   
   @Override
   public void setSoundEffect(Sound.SOUND s) { sound=s; }
