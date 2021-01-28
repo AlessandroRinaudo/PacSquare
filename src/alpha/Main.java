@@ -41,6 +41,8 @@ public class Main extends Application{
 
   //---VARIABLES---//
   private static DataService data;
+  private static DataService data2;
+
   public static EngineService engine;
   private static ViewerService viewer;
   private static AnimationTimer timer;
@@ -50,13 +52,16 @@ public class Main extends Application{
     //readArguments(args);
 
     data = new Data();
+    data2 = new Data();
+
     engine = new Engine();
     viewer = new Viewer();
 
-    ((Engine)engine).bindDataService(data);
-    ((Viewer)viewer).bindReadService(data);
+    ((Engine)engine).bindDataService(data,data2);
+    ((Viewer)viewer).bindReadService(data, data2);
 
     data.init();
+    data2.init();
     engine.init();
     viewer.init();
     
@@ -133,8 +138,8 @@ public class Main extends Application{
     });
     
     stage.setScene(scene);
-    stage.setWidth(HardCodedParameters.defaultWidth);
-    stage.setHeight(HardCodedParameters.defaultHeight);
+    stage.setWidth(HardCodedParameters.defaultWidth+200);
+    stage.setHeight(HardCodedParameters.defaultHeight+100);
     stage.setOnShown(new EventHandler<WindowEvent>() {
       @Override public void handle(WindowEvent event) {
         engine.start();

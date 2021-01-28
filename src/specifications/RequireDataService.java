@@ -7,5 +7,5 @@
 package specifications;
 
 public interface RequireDataService {
-  public void bindDataService(DataService service);
+  public void bindDataService(DataService service, DataService data2);
 }
