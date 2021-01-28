@@ -41,7 +41,7 @@ public class Main extends Application{
 
   //---VARIABLES---//
   private static DataService data;
-  private static EngineService engine;
+  public static EngineService engine;
   private static ViewerService viewer;
   private static AnimationTimer timer;
 
@@ -66,30 +66,32 @@ public class Main extends Application{
   @Override public void start(Stage stage) {
     final Scene scene = new Scene(((Viewer)viewer).getPanel());
 
-    scene.setFill(Color.CORNFLOWERBLUE);
+    scene.setFill(Color.BLACK);
     scene.setOnKeyPressed(new EventHandler<KeyEvent>(){
       @Override
         public void handle(KeyEvent event) {
-          if (event.getCode()==KeyCode.LEFT){
+          if (event.getCode()==KeyCode.LEFT && engine.gameON()){
             engine.setHeroesCommand(User.COMMAND.LEFT);  
             viewer.setHeroesCommand(User.COMMAND.LEFT);
 
+
           } 
-          if (event.getCode()==KeyCode.RIGHT){
+          if (event.getCode()==KeyCode.RIGHT && engine.gameON()){
             engine.setHeroesCommand(User.COMMAND.RIGHT); 
             viewer.setHeroesCommand(User.COMMAND.RIGHT);
 
           }
-          if (event.getCode()==KeyCode.UP){
+          if (event.getCode()==KeyCode.UP && engine.gameON()){
             engine.setHeroesCommand(User.COMMAND.UP);  
             viewer.setHeroesCommand(User.COMMAND.UP);
 
           } 
-          if (event.getCode()==KeyCode.DOWN){
+          if (event.getCode()==KeyCode.DOWN && engine.gameON()){
             engine.setHeroesCommand(User.COMMAND.DOWN); 
             viewer.setHeroesCommand(User.COMMAND.DOWN);
 
-          }
+          } 
+      
           event.consume();
         }
     });
