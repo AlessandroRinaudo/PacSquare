@@ -33,9 +33,11 @@ public class Engine implements EngineService, RequireDataService{
   private DataService data;
   private User.COMMAND command;
   private Random gen;
-  private boolean moveLeft,moveRight,moveUp,moveDown;
+  public boolean moveLeft,moveRight,moveUp,moveDown,gameon=true;
   private double heroesVX,heroesVY;
   public int cpt=0;
+  int score=0,vitesseJeu=0;
+
 
   public Engine(){}
 
@@ -63,12 +65,13 @@ public class Engine implements EngineService, RequireDataService{
     engineClock.schedule(new TimerTask(){
       boolean rep = true;
       public void run() {
-        System.out.println(data.getHeroesPosition().x);
+
+        System.out.println(score);
         //System.out.println("Game step #"+data.getStepNumber()+": checked.");
         
         cpt++;
-        if (cpt%30==0 ) spawnPhantom();
-        if (data.getFruits().size()<10 && cpt %20 ==0) spawnFruit();
+        if (   cpt%100==0 ) spawnPhantom();
+        if (data.getFruits().size()<10 && cpt %70 ==0) spawnFruit();
 
         updateSpeedHeroes();
         updateCommandHeroes();
@@ -86,13 +89,15 @@ public class Engine implements EngineService, RequireDataService{
         ArrayList<PhantomService> phantoms = new ArrayList<PhantomService>();
 
         data.setSoundEffect(Sound.SOUND.None);
-        
+        int score=0;
+
         for (PhantomService p:data.getPhantoms()){
-          if (p.getAction()==PhantomService.MOVE.LEFT) moveLeft(p);
+          if (p.getAction()==PhantomService.MOVE.LEFT ) moveLeft(p,score);
 
           if (collisionHeroesPhantom(p)){
-            // data.setSoundEffect(Sound.SOUND.HeroesGotHit);
+            data.setSoundEffect(Sound.SOUND.HeroesGotHit);
             // score++;
+            gameon=false;
             stop();
           } else {
         	  
@@ -103,7 +108,6 @@ public class Engine implements EngineService, RequireDataService{
       
         data.setSoundEffect(Sound.SOUND.None);
         
-        int score=0;
 
 
         for (FruitService f:data.getFruits()){
@@ -115,6 +119,7 @@ public class Engine implements EngineService, RequireDataService{
         	  fruits.add(f);
           }
         }
+        vitesseJeu+=score;
         data.addScore(score);
 
         data.setFruits(fruits);
@@ -204,8 +209,8 @@ public class Engine implements EngineService, RequireDataService{
     p.setPosition(new Position(p.getPosition().x-fruitStep,p.getPosition().y));
   }
 
-  private void moveLeft(PhantomService p){
-	    p.setPosition(new Position(p.getPosition().x-phantomStep,p.getPosition().y));
+  private void moveLeft(PhantomService p, int score){
+	    p.setPosition(new Position(p.getPosition().x-(phantomStep+(vitesseJeu*.2)),p.getPosition().y));
 	  }
   private void moveRight(FruitService p){
     if(data.getHeroesPosition().x <= 95) {
@@ -226,9 +231,9 @@ public class Engine implements EngineService, RequireDataService{
 
   private boolean collisionHeroesFruit(FruitService p){
    return (
-      ((data.getHeroesPosition().x-p.getPosition().x)*(data.getHeroesPosition().x-p.getPosition().x)+
-      (data.getHeroesPosition().y-p.getPosition().y)*(data.getHeroesPosition().y-p.getPosition().y))+1800 <
-      (data.getHeroesWidth()*.33+data.getFruitWidth())*(data.getHeroesWidth()*.33+data.getFruitWidth())
+      ((data.getHeroesPosition().x-p.getPosition().x+17)*(data.getHeroesPosition().x-p.getPosition().x+17)+
+      (data.getHeroesPosition().y-p.getPosition().y+15)*(data.getHeroesPosition().y-p.getPosition().y+15)) <
+      (data.getHeroesWidth()*.1+data.getFruitWidth())*(data.getHeroesWidth()*.1+data.getFruitWidth())
     );
     
 	
@@ -237,9 +242,9 @@ public class Engine implements EngineService, RequireDataService{
   
   private boolean collisionHeroesPhantom(PhantomService p){
 	   return (
-			      ((data.getHeroesPosition().x-p.getPosition().x)*(data.getHeroesPosition().x-p.getPosition().x)+
-			    		  (data.getHeroesPosition().y-p.getPosition().y)*(data.getHeroesPosition().y-p.getPosition().y))+1800 <
-	      (data.getHeroesWidth()*.33+data.getPhantomWidth())*(data.getHeroesWidth()*.33+data.getPhantomWidth())
+			      ((data.getHeroesPosition().x-p.getPosition().x-30)*(data.getHeroesPosition().x-p.getPosition().x-30)+
+			    		  (data.getHeroesPosition().y-p.getPosition().y-60)*(data.getHeroesPosition().y-p.getPosition().y)-60) <
+	      (data.getHeroesWidth()*.2+data.getPhantomWidth())*(data.getHeroesWidth()*.2+data.getPhantomWidth())
 	    );
 	    
 		
@@ -252,5 +257,9 @@ public class Engine implements EngineService, RequireDataService{
   
   private boolean collisionHeroesFruits(){
     for (FruitService p:data.getFruits()) if (collisionHeroesFruit(p)) return true; return false;
+  }
+  
+  public boolean gameON() {
+	  return gameon;
   }
 }
