@@ -109,6 +109,7 @@ public class Data implements DataService{
   @Override
   public void setFruits(ArrayList<FruitService> fruits) { this.fruits=fruits; }
   
+    
   @Override
   public void addPhantom(Position p) { phantoms.add(new MoveLeftPhantom(p)); }
   
