@@ -10,9 +10,11 @@ import tools.HardCodedParameters;
 import tools.User;
 
 
+
 import specifications.ViewerService;
 import specifications.ReadService;
 import specifications.RequireReadService;
+import specifications.DataService;
 import specifications.FruitService;
 import specifications.PhantomService;
 
@@ -36,28 +38,43 @@ public class Viewer implements ViewerService, RequireReadService{
   private static final double defaultMainWidth=HardCodedParameters.defaultWidth,
                               defaultMainHeight=HardCodedParameters.defaultHeight;
   private ReadService data;
+  private ReadService data2;
+
   private ImageView heroesAvatar;
-  
+  private ImageView phantomAvatar;
+  private ImageView phantomAvatarR;
+
   private Image heroesSpriteSheet;
+  private Image phantomSpriteSheet;
+
   private ArrayList<Rectangle> heroesAvatarViewports;
+  private ArrayList<Circle> phantomAvatarViewports;
+
   private ArrayList<Integer> heroesAvatarXModifiers;
   private ArrayList<Integer> heroesAvatarYModifiers;
+  private ArrayList<Integer> phantomAvatarXModifiers;
+  private ArrayList<Integer> phantomAvatarYModifiers;
   private int heroesAvatarViewportIndex;
-  private double xShrink,yShrink,shrink,xModifier,yModifier,heroesScale;
+  private int phantomAvatarViewportIndex;
+
+  private double xShrink,yShrink,shrink,xModifier,yModifier,heroesScale,phantomScale;
   private boolean moveLeft,moveRight,moveUp,moveDown;
   Image avatarRight=new Image("file:src/images/avatarRight.png");
   Image avatarLeft=new Image("file:src/images/avatarLeft.png");
   Image avatarUp=new Image("file:src/images/avatarUp.png");
   Image avatarDown=new Image("file:src/images/avatarDown.png");
+  Image phantomImg=new Image("file:src/images/phantom.png");
+  Image phantomImgR=new Image("file:src/images/phantomR.png");
 
   Image cyclope=new Image("file:src/images/cyclope.png");
 
 
   public Viewer(){}
   
-  @Override
-  public void bindReadService(ReadService service){
+@Override
+  public void bindReadService(ReadService service, ReadService service2){
     data=service;
+    data2=service2;
   }
 
 
@@ -77,7 +94,12 @@ public class Viewer implements ViewerService, RequireReadService{
 
     //heroesSpriteSheet =  cyclope;
  
-    heroesAvatar = new ImageView(cyclope);
+    heroesAvatar = new ImageView(avatarRight);
+    phantomAvatar = new ImageView(phantomImg);
+    phantomAvatarR = new ImageView(phantomImgR);
+
+
+
     //heroesAvatar = new Circle(20,  Color.rgb(255,238,0));
     //heroesAvatar.setEffect(new Lighting());
     heroesAvatar.setTranslateX(data.getHeroesPosition().x);
@@ -88,6 +110,15 @@ public class Viewer implements ViewerService, RequireReadService{
     heroesAvatarYModifiers = new ArrayList<Integer>();
 
     heroesAvatarViewportIndex=0;
+    
+    //phantomAvatar.setTranslateX(data.getPhantoms().get(0).getPosition().x);
+    //phantomAvatar.setTranslateX(data.getPhantoms().get(0).getPosition().y);
+
+    phantomAvatarViewports = new ArrayList<Circle>();
+    phantomAvatarXModifiers = new ArrayList<Integer>();
+    phantomAvatarYModifiers = new ArrayList<Integer>();
+
+    phantomAvatarViewportIndex=0;
     
     //TODO: replace the following with XML loader
     //heroesAvatarViewports.add(new Rectangle2D(301,386,95,192));
@@ -102,6 +133,13 @@ public class Viewer implements ViewerService, RequireReadService{
     heroesAvatarViewports.add(new Rectangle(HardCodedParameters.heroesHeight,HardCodedParameters.heroesWidth,  Color.rgb(255,238,0)));
 
     heroesAvatarXModifiers.add(0);heroesAvatarYModifiers.add(0);
+    
+    
+    double radius=.5*Math.min(shrink*data.getPhantomWidth(),shrink*data.getPhantomHeight());
+
+    phantomAvatarViewports.add(new Circle(radius+2000,  Color.rgb(255,238,0)));
+
+    phantomAvatarXModifiers.add(0);phantomAvatarYModifiers.add(0);
    /* heroesAvatarXModifiers.add(6);heroesAvatarYModifiers.add(-6);
     heroesAvatarXModifiers.add(2);heroesAvatarYModifiers.add(-8);
     heroesAvatarXModifiers.add(1);heroesAvatarYModifiers.add(-10);
@@ -144,7 +182,7 @@ public class Viewer implements ViewerService, RequireReadService{
     yModifier=.01*shrink*defaultMainHeight;
 
     //Yucky hard-conding
-    Rectangle map = new Rectangle(-2*xModifier+shrink*defaultMainWidth,
+    Rectangle map = new Rectangle(-2*xModifier+shrink*defaultMainWidth+130,
                                   -.2*shrink*defaultMainHeight+shrink*defaultMainHeight);
     map.setFill(Color.BLACK);
     map.setStroke(Color.YELLOW);
@@ -156,16 +194,23 @@ public class Viewer implements ViewerService, RequireReadService{
     
     Text greets = new Text(-0.1*shrink*defaultMainHeight+.5*shrink*defaultMainWidth,
                            -0.1*shrink*defaultMainWidth+shrink*defaultMainHeight,
-                           "PacSquare");
+                           "\n PacSquare");
     greets.setFont(new Font(.05*shrink*defaultMainHeight));
+    
+    greets.setFill(Color.WHITE);
+
     
     Text score = new Text(-0.1*shrink*defaultMainHeight+.5*shrink*defaultMainWidth,
                            -0.05*shrink*defaultMainWidth+shrink*defaultMainHeight,
-                           "Score: "+data.getScore());
+                           "\n Score: "+data.getScore());
     score.setFont(new Font(.05*shrink*defaultMainHeight));
+    score.setFill(Color.WHITE);
+
     
     int index=heroesAvatarViewportIndex/spriteSlowDownRate;
     heroesScale=data.getHeroesHeight()*shrink/heroesAvatarViewports.get(index).getHeight();
+    phantomScale=data.getPhantomHeight()*shrink/phantomAvatarViewports.get(index).getRadius();
+
     //heroesAvatar.setViewport(heroesAvatarViewports.get(index));
     heroesAvatar.setFitHeight(data.getHeroesHeight()*shrink);
     heroesAvatar.setPreserveRatio(true);
@@ -180,25 +225,24 @@ public class Viewer implements ViewerService, RequireReadService{
                                shrink*heroesScale*heroesAvatarYModifiers.get(index)
                               );
     heroesAvatarViewportIndex=(heroesAvatarViewportIndex+1)%(heroesAvatarViewports.size()*spriteSlowDownRate);
+//
+
+    /*phantomAvatar.setTranslateX(shrink*data.getPhantomPosition().x+
+                               shrink*xModifier+
+                               -phantomScale*0.5*phantomAvatarViewports.get(index).getHeight()+
+                               shrink*phantomScale*phantomAvatarXModifiers.get(index)
+                              );
+    phantomAvatar.setTranslateY(shrink*data.getPhantomPosition().y+
+                               shrink*yModifier+
+                               -phantomScale*0.5*phantomAvatarViewports.get(index).getWidth()+
+                               shrink*phantomScale*phantomAvatarYModifiers.get(index)
+                              );*/
+    phantomAvatarViewportIndex=(phantomAvatarViewportIndex+1)%(phantomAvatarViewports.size()*spriteSlowDownRate);
+//
 
     Group panel = new Group();
     panel.getChildren().addAll(map,greets,score,heroesAvatar);
-
-    ArrayList<PhantomService> phantoms = data.getPhantoms();
-    PhantomService p;
-
-    for (int i=0; i<phantoms.size();i++){
-      p=phantoms.get(i);
-      double radius=.5*Math.min(shrink*data.getPhantomWidth(),shrink*data.getPhantomHeight());
-      Circle phantomAvatar = new Circle(radius+12,Color.PINK);
-      phantomAvatar.setEffect(new Lighting());
-      phantomAvatar.setTranslateX(shrink*p.getPosition().x+shrink*xModifier-radius);
-      phantomAvatar.setTranslateY(shrink*p.getPosition().y+shrink*yModifier-radius+2);
-      panel.getChildren().add(phantomAvatar);
-      
-    }
     
-
     ArrayList<FruitService> fruits = data.getFruits();    
     FruitService f;
 
@@ -209,10 +253,70 @@ public class Viewer implements ViewerService, RequireReadService{
 
       Circle fruitAvatar = new Circle(radius+1,Color.YELLOW);
       fruitAvatar.setEffect(new Lighting());
-      fruitAvatar.setTranslateX(shrink*f.getPosition().x+shrink*xModifier-radius+13);
-      fruitAvatar.setTranslateY(shrink*f.getPosition().y+shrink*yModifier-radius+15);
+      fruitAvatar.setTranslateX(shrink*f.getPosition().x+shrink*xModifier-radius);
+      fruitAvatar.setTranslateY(shrink*f.getPosition().y+shrink*yModifier-radius);
       panel.getChildren().add(fruitAvatar);
     }
+
+    ArrayList<PhantomService> phantoms = data.getPhantoms();
+    ArrayList<PhantomService> phantoms2 = data2.getPhantoms();
+
+    PhantomService p;
+    PhantomService p2;
+
+
+    for (int i=0; i<phantoms.size();i++){
+      p=phantoms.get(i);
+      p2=phantoms2.get(i);
+
+      
+      double radius=.5*Math.min(shrink*data.getPhantomWidth(),shrink*data.getPhantomHeight());
+      //Circle phantomAvatar = new Circle(radius+12,Color.PINK);
+      //phantomAvatar.setEffect(new Lighting());
+      phantomAvatar = new ImageView(phantomImgR);
+      phantomAvatar.setFitHeight(data2.getPhantomHeight()*shrink*3);
+      phantomAvatar.setPreserveRatio(true);
+      phantomAvatar.setTranslateX(shrink*p2.getPosition().x+
+              shrink*xModifier+
+              -phantomScale*0.5*phantomAvatarViewports.get(index).getRadius()+
+              shrink*phantomScale*phantomAvatarXModifiers.get(index)
+             );
+phantomAvatar.setTranslateY(shrink*p2.getPosition().y+
+              shrink*yModifier+
+              -phantomScale*0.5*phantomAvatarViewports.get(index).getRadius()+
+              shrink*phantomScale*phantomAvatarYModifiers.get(index)
+             );
+
+
+
+      //phantomAvatar.setTranslateX(shrink*p.getPosition().x+shrink*xModifier-radius);
+      //phantomAvatar.setTranslateY(shrink*p.getPosition().y+shrink*yModifier-radius-);
+      panel.getChildren().add(phantomAvatar);
+      
+      phantomAvatar = new ImageView(phantomImg);
+      phantomAvatar.setFitHeight(data.getPhantomHeight()*shrink*3);
+      phantomAvatar.setPreserveRatio(true);
+      phantomAvatar.setTranslateX(shrink*p.getPosition().x+
+              shrink*xModifier+
+              -phantomScale*0.5*phantomAvatarViewports.get(index).getRadius()+
+              shrink*phantomScale*phantomAvatarXModifiers.get(index)
+             );
+phantomAvatar.setTranslateY(shrink*p.getPosition().y+
+              shrink*yModifier+
+              -phantomScale*0.5*phantomAvatarViewports.get(index).getRadius()+
+              shrink*phantomScale*phantomAvatarYModifiers.get(index)
+             );
+
+
+
+      //phantomAvatar.setTranslateX(shrink*p.getPosition().x+shrink*xModifier-radius);
+      //phantomAvatar.setTranslateY(shrink*p.getPosition().y+shrink*yModifier-radius-);
+      panel.getChildren().add(phantomAvatar);
+      
+    }
+    
+
+
 
     return panel;
   

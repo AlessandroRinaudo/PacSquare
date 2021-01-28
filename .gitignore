@@ -3,3 +3,6 @@ init.sh
 src/images/.DS_Store
 bin/*
 META-INF/*
+.project
+.settings/org.eclipse.core.resources.prefs
+project_alpha_20210118.iml
