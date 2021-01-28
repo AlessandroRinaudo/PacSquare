@@ -182,7 +182,7 @@ public class Viewer implements ViewerService, RequireReadService{
     yModifier=.01*shrink*defaultMainHeight;
 
     //Yucky hard-conding
-    Rectangle map = new Rectangle(-2*xModifier+shrink*defaultMainWidth,
+    Rectangle map = new Rectangle(-2*xModifier+shrink*defaultMainWidth+130,
                                   -.2*shrink*defaultMainHeight+shrink*defaultMainHeight);
     map.setFill(Color.BLACK);
     map.setStroke(Color.YELLOW);
@@ -194,7 +194,7 @@ public class Viewer implements ViewerService, RequireReadService{
     
     Text greets = new Text(-0.1*shrink*defaultMainHeight+.5*shrink*defaultMainWidth,
                            -0.1*shrink*defaultMainWidth+shrink*defaultMainHeight,
-                           "PacSquare");
+                           "\n PacSquare");
     greets.setFont(new Font(.05*shrink*defaultMainHeight));
     
     greets.setFill(Color.WHITE);
@@ -202,7 +202,7 @@ public class Viewer implements ViewerService, RequireReadService{
     
     Text score = new Text(-0.1*shrink*defaultMainHeight+.5*shrink*defaultMainWidth,
                            -0.05*shrink*defaultMainWidth+shrink*defaultMainHeight,
-                           "Score: "+data.getScore());
+                           "\n Score: "+data.getScore());
     score.setFont(new Font(.05*shrink*defaultMainHeight));
     score.setFill(Color.WHITE);
 

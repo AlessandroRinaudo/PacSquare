@@ -141,8 +141,8 @@ public class Engine implements EngineService, RequireDataService{
         vitesseJeu+=score;
         data.addScore(score);
         
-        data.setPhantoms(phantomsR);
-        data2.setPhantoms(phantomsL);
+        //data.setPhantoms(phantomsR);
+        //data2.setPhantoms(phantomsL);
 
         
 

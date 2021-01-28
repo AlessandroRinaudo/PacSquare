@@ -138,8 +138,8 @@ public class Main extends Application{
     });
     
     stage.setScene(scene);
-    stage.setWidth(HardCodedParameters.defaultWidth);
-    stage.setHeight(HardCodedParameters.defaultHeight);
+    stage.setWidth(HardCodedParameters.defaultWidth+200);
+    stage.setHeight(HardCodedParameters.defaultHeight+100);
     stage.setOnShown(new EventHandler<WindowEvent>() {
       @Override public void handle(WindowEvent event) {
         engine.start();
