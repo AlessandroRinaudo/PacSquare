@@ -15,6 +15,7 @@ import tools.Sound;
 import specifications.EngineService;
 import specifications.DataService;
 import specifications.RequireDataService;
+import specifications.FruitService;
 import specifications.PhantomService;
 
 import java.util.Timer;
@@ -22,26 +23,31 @@ import java.util.TimerTask;
 import java.util.Random;
 import java.util.ArrayList;
 
-public class Engine implements EngineService, RequireDataService{
-  private static final double friction=HardCodedParameters.friction,
-                              heroesStep=HardCodedParameters.heroesStep,
-                              phantomStep=HardCodedParameters.phantomStep;
+public class Engine implements EngineService, RequireDataService {
+  private static final double friction = HardCodedParameters.friction, heroesStep = HardCodedParameters.heroesStep,
+      fruitStep = HardCodedParameters.fruitStep, phantomStep = HardCodedParameters.phantomStep;
   private Timer engineClock;
   private DataService data;
+  private DataService data2;
+
   private User.COMMAND command;
   private Random gen;
-  private boolean moveLeft,moveRight,moveUp,moveDown;
-  private double heroesVX,heroesVY;
+  public boolean moveLeft, moveRight, moveUp, moveDown, gameon = true;
+  private double heroesVX, heroesVY;
+  public int cpt = 0;
+  int score = 0, vitesseJeu = 0;
 
-  public Engine(){}
-
-  @Override
-  public void bindDataService(DataService service){
-    data=service;
+  public Engine() {
   }
-  
+
   @Override
-  public void init(){
+  public void bindDataService(DataService service) {
+    data = service; // hellooo
+
+  }
+
+  @Override
+  public void init() {
     engineClock = new Timer();
     command = User.COMMAND.NONE;
     gen = new Random();
@@ -54,159 +60,241 @@ public class Engine implements EngineService, RequireDataService{
   }
 
   @Override
-  public void start(){
-    engineClock.schedule(new TimerTask(){
+  public void start() {
+    engineClock.schedule(new TimerTask() {
+      boolean rep = true;
+
       public void run() {
-        System.out.println(data.getHeroesPosition().x);
-        //System.out.println("Game step #"+data.getStepNumber()+": checked.");
-        
-        if (gen.nextInt(10)<0.01 && data.getPhantoms().size()<5) spawnPhantom();
+
+        // System.out.println(score);
+        // System.out.println("Game step #"+data.getStepNumber()+": checked.");
+
+        cpt++;
+        if (cpt % 100 == 0)
+          spawnPhantom();
+        if (data.getFruits().size() < 4 && cpt % 100 == 0)
+          spawnFruit();
 
         updateSpeedHeroes();
         updateCommandHeroes();
         updatePositionHeroes();
-
-        ArrayList<PhantomService> phantoms = new ArrayList<PhantomService>();
-        int score=0;
-
-        data.setSoundEffect(Sound.SOUND.None);
-        /*
-        if (ding()) {
-        	if (collisionHeroesPhantom(p)){
-                data.setSoundEffect(Sound.SOUND.HeroesGotHit);
-                score++;
-              } else {
-                if (p.getPosition().x>0) phantoms.add(p);
-              }
-        }
-        */
-        
-        
-
-        for (PhantomService p:data.getPhantoms()){
-       /*   if (p.getAction()==PhantomService.MOVE.LEFT) moveLeft(p);
-          if (p.getAction()==PhantomService.MOVE.RIGHT) moveRight(p);
-          if (p.getAction()==PhantomService.MOVE.UP) moveUp(p);
-          if (p.getAction()==PhantomService.MOVE.DOWN) moveDown(p);*/
-
-          if (collisionHeroesPhantom(p)){
-            data.setSoundEffect(Sound.SOUND.HeroesGotHit);
-            score++;
-          } else {
-            if (p.getPosition().x>0) phantoms.add(p);
+        if (rep) {
+          try {
+            Thread.sleep(1000);
+            rep = false;
+          } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
           }
         }
 
+        ArrayList<PhantomService> phantomsR = new ArrayList<PhantomService>();
+        ArrayList<PhantomService> phantomsL = new ArrayList<PhantomService>();
+
+        data.setSoundEffect(Sound.SOUND.None);
+        int score = 0;
+
+        for (PhantomService p : data.getPhantoms()) {
+          moveLeft(p, score);
+
+          if (collisionHeroesPhantom(p)) {
+            data.setSoundEffect(Sound.SOUND.HeroesGotHit);
+            gameon = false;
+            stop();
+          } else {
+
+            if (p.getPosition().x > 0 && p.getPosition().x < HardCodedParameters.maxX)
+              phantomsR.add(p);
+          }
+        }
+        for (PhantomService p : data.getPhantoms2()) {
+          moveRight(p);
+
+          if (collisionHeroesPhantom(p)) {
+            data.setSoundEffect(Sound.SOUND.HeroesGotHit);
+            gameon = false;
+            stop();
+          } else {
+
+            if (p.getPosition().x < HardCodedParameters.maxX - 50 && p.getPosition().x > 0)
+              phantomsL.add(p);
+          }
+        }
+
+        ArrayList<FruitService> fruits = new ArrayList<FruitService>();
+        
+
+        data.setSoundEffect(Sound.SOUND.None);
+
+        for (FruitService f : data.getFruits()) {
+
+          if (collisionHeroesFruit(f)) {
+            data.setSoundEffect(Sound.SOUND.HeroesGotHit);
+            score++;
+          } else {
+            fruits.add(f);
+          }
+        }
+        
+        vitesseJeu += score;
         data.addScore(score);
 
-        data.setPhantoms(phantoms);
+        data.setFruits(fruits);
 
-        data.setStepNumber(data.getStepNumber()+1);
+        data.setStepNumber(data.getStepNumber() + 1);
       }
-    },0,HardCodedParameters.enginePaceMillis);
+    }, 0, HardCodedParameters.enginePaceMillis);
   }
 
   @Override
-  public void stop(){
+  public void stop() {
     engineClock.cancel();
   }
 
   @Override
-  public void setHeroesCommand(User.COMMAND c){
-    if (c==User.COMMAND.LEFT) moveLeft=true;
-    if (c==User.COMMAND.RIGHT) moveRight=true;
-    if (c==User.COMMAND.UP) moveUp=true;
-    if (c==User.COMMAND.DOWN) moveDown=true;
+  public void setHeroesCommand(User.COMMAND c) {
+    if (c == User.COMMAND.LEFT)
+      moveLeft = true;
+    if (c == User.COMMAND.RIGHT)
+      moveRight = true;
+    if (c == User.COMMAND.UP)
+      moveUp = true;
+    if (c == User.COMMAND.DOWN)
+      moveDown = true;
   }
-  
+
   @Override
-  public void releaseHeroesCommand(User.COMMAND c){
-    if (c==User.COMMAND.LEFT) moveLeft=false;
-    if (c==User.COMMAND.RIGHT) moveRight=false;
-    if (c==User.COMMAND.UP) moveUp=false;
-    if (c==User.COMMAND.DOWN) moveDown=false;
+  public void releaseHeroesCommand(User.COMMAND c) {
+    if (c == User.COMMAND.LEFT)
+      moveLeft = false;
+    if (c == User.COMMAND.RIGHT)
+      moveRight = false;
+    if (c == User.COMMAND.UP)
+      moveUp = false;
+    if (c == User.COMMAND.DOWN)
+      moveDown = false;
   }
 
-  private void updateSpeedHeroes(){
-    heroesVX*=friction;
-    heroesVY*=friction;
+  private void updateSpeedHeroes() {
+    heroesVX *= friction;
+    heroesVY *= friction;
   }
 
-  private void updateCommandHeroes(){
-   /* double xShrink=1;
-    double yShrink=1;
-    double shrink=Math.min(xShrink,yShrink);
-    double xModifier=.01*shrink*HardCodedParameters.defaultWidth;
-    double yModifier=.01*shrink*HardCodedParameters.defaultHeight;
-    xModifier=-2*xModifier+shrink*HardCodedParameters.defaultWidth;
-    yModifier=-.2*shrink*HardCodedParameters.defaultHeight+shrink*HardCodedParameters.defaultHeight;
-    if (moveLeft && data.getHeroesPosition().x >= 45) heroesVX-=heroesStep;
-    if (moveRight &&  data.getHeroesPosition().x <= xModifier*0.95) heroesVX+=heroesStep;
-    if (moveUp && data.getHeroesPosition().y >= 80) heroesVY-=heroesStep;
-    if (moveDown && data.getHeroesPosition().y <= yModifier*0.85) heroesVY+=heroesStep;*/
-	    if (moveLeft) heroesVX-=heroesStep;
-	    if (moveRight) heroesVX+=heroesStep;
-	    if (moveUp) heroesVY-=heroesStep;
-	    if (moveDown) heroesVY+=heroesStep;
-  }
-  
-  private void updatePositionHeroes(){
-		data.setHeroesPosition(new Position(data.getHeroesPosition().x+heroesVX,data.getHeroesPosition().y+heroesVY));
+  private void updateCommandHeroes() {
 
-	  
-	  if (data.getHeroesPosition().x-(HardCodedParameters.heroesWidth/2)<0) data.setHeroesPosition(new Position((int)HardCodedParameters.heroesWidth/2,data.getHeroesPosition().y));
-	  if (data.getHeroesPosition().x+(HardCodedParameters.heroesWidth/2)>HardCodedParameters.maxX) data.setHeroesPosition(new Position((int)HardCodedParameters.maxX-(int)HardCodedParameters.heroesWidth/2,data.getHeroesPosition().y));
-	  if (data.getHeroesPosition().y-(HardCodedParameters.heroesHeight/2)<30) data.setHeroesPosition(new Position(data.getHeroesPosition().x,40));
-	  if (data.getHeroesPosition().y+(HardCodedParameters.heroesHeight/2)>HardCodedParameters.maxY*.8) data.setHeroesPosition(new Position(data.getHeroesPosition().x,(int)HardCodedParameters.maxY*.8-(int)HardCodedParameters.heroesHeight/2));
+    if (moveLeft)
+      heroesVX -= heroesStep;
+    if (moveRight)
+      heroesVX += heroesStep;
+    if (moveUp)
+      heroesVY -= heroesStep;
+    if (moveDown)
+      heroesVY += heroesStep;
+  }
+
+  private void updatePositionHeroes() {
+    data.setHeroesPosition(new Position(data.getHeroesPosition().x + heroesVX, data.getHeroesPosition().y + heroesVY));
+
+    if (data.getHeroesPosition().x - (HardCodedParameters.heroesWidth / (double) 3) < 0)
+      data.setHeroesPosition(new Position((int) HardCodedParameters.heroesWidth / 3, data.getHeroesPosition().y));
+    if (data.getHeroesPosition().x + (HardCodedParameters.heroesWidth / (double) 2) > HardCodedParameters.maxX+120)
+      data.setHeroesPosition(new Position((int) HardCodedParameters.maxX +120- (int) HardCodedParameters.heroesWidth / (double) 2,data.getHeroesPosition().y));
+    if (data.getHeroesPosition().y - (HardCodedParameters.heroesHeight / (double) 3) < 0)
+      data.setHeroesPosition(new Position(data.getHeroesPosition().x, (int) HardCodedParameters.heroesHeight / (double) 3));
+    if (data.getHeroesPosition().y + (HardCodedParameters.heroesHeight / (double) 3) > HardCodedParameters.maxY * .8)
+      data.setHeroesPosition(new Position(data.getHeroesPosition().x,(int) HardCodedParameters.maxY * .8 - (int) HardCodedParameters.heroesHeight / (double) 3));
 
   }
 
-  private void spawnPhantom(){
-    int x=0;
-    int y=0;
-    boolean cont=true;
+  private void spawnPhantom() {
+    int x = 0;
+    int y = 0;
+    boolean cont = true;
     while (cont) {
-      y=(int)(gen.nextInt((int)(HardCodedParameters.defaultHeight*.6))+HardCodedParameters.defaultHeight*.1);
-      x=(int)(gen.nextInt((int)(HardCodedParameters.defaultWidth*.6))+HardCodedParameters.defaultWidth*.1);
+      y = (int) (gen.nextInt((int) (HardCodedParameters.defaultHeight * .6)) + HardCodedParameters.defaultHeight * .1);
+      x = HardCodedParameters.defaultWidth;
 
-      cont=false;
-      for (PhantomService p:data.getPhantoms()){
-        if (p.getPosition().equals(new Position(x,y))) cont=true;
+      cont = false;
+      for (PhantomService p : data.getPhantoms()) {
+        if (p.getPosition().equals(new Position(x, y)))
+          cont = true;
       }
     }
-    data.addPhantom(new Position(x,y));
-  }
+    data.addPhantom(new Position(x, y));
 
-  private void moveLeft(PhantomService p){
-    p.setPosition(new Position(p.getPosition().x-phantomStep,p.getPosition().y));
-  }
+    cont = true;
+    while (cont) {
+      y = (int) (gen.nextInt((int) (HardCodedParameters.defaultHeight * .6)) + HardCodedParameters.defaultHeight * .1);
+      x = HardCodedParameters.minX;
 
-  private void moveRight(PhantomService p){
-    if(data.getHeroesPosition().x <= 95) {
-      p.setPosition(new Position(p.getPosition().x + phantomStep, p.getPosition().y));
+      cont = false;
+      for (PhantomService p : data.getPhantoms2()) {
+        if (p.getPosition().equals(new Position(x, y)))
+          cont = true;
+      }
     }
-    else{ }
+    data.addPhantom2(new Position(x, y));
+
   }
 
-  private void moveUp(PhantomService p){
-    p.setPosition(new Position(p.getPosition().x,p.getPosition().y-phantomStep));
-  }
+  private void spawnFruit() {
+    int x = 0;
+    int y = 0;
+    boolean cont = true;
+    while (cont) {
+      y = (int) (gen.nextInt((int) (HardCodedParameters.defaultHeight * .6)) + HardCodedParameters.defaultHeight * .1);
+      x = (int) (gen.nextInt((int) (HardCodedParameters.defaultWidth * .6)) + HardCodedParameters.defaultWidth * .1);
 
-  private void moveDown(PhantomService p){
-    if(HardCodedParameters.defaultHeight > p.getPosition().y) {
-      p.setPosition(new Position(p.getPosition().x, p.getPosition().y + phantomStep));
+      cont = false;
+      for (FruitService p : data.getFruits()) {
+        if (p.getPosition().equals(new Position(x, y)))
+          cont = true;
+      }
     }
+    data.addFruit(new Position(x, y));
   }
 
-  private boolean collisionHeroesPhantom(PhantomService p){
-    return (
-      (data.getHeroesPosition().x-p.getPosition().x)*(data.getHeroesPosition().x-p.getPosition().x)+
-      (data.getHeroesPosition().y-p.getPosition().y)*(data.getHeroesPosition().y-p.getPosition().y) <
-      0.25*(data.getHeroesWidth()+data.getPhantomWidth())*(data.getHeroesWidth()+data.getPhantomWidth())
-    );
+  private void moveLeft(PhantomService p, int score) {
+    p.setPosition(new Position(p.getPosition().x - (phantomStep + (vitesseJeu * .2)), p.getPosition().y));
   }
-  
-  private boolean collisionHeroesPhantoms(){
-    for (PhantomService p:data.getPhantoms()) if (collisionHeroesPhantom(p)) return true; return false;
+
+  private void moveRight(PhantomService p) {
+    p.setPosition(new Position(p.getPosition().x + (phantomStep + (vitesseJeu * .2)), p.getPosition().y));
+
+  }
+
+
+  private boolean collisionHeroesFruit(FruitService p) {
+    return (((data.getHeroesPosition().x - p.getPosition().x + 17)
+        * (data.getHeroesPosition().x - p.getPosition().x + 17)
+        + (data.getHeroesPosition().y - p.getPosition().y + 15)
+            * (data.getHeroesPosition().y - p.getPosition().y + 15)) < (data.getHeroesWidth() * .1
+                + data.getFruitWidth()) * (data.getHeroesWidth() * .1 + data.getFruitWidth()));
+
+  }
+
+  private boolean collisionHeroesPhantom(PhantomService p) {
+    return (((data.getHeroesPosition().x - p.getPosition().x - 30)
+        * (data.getHeroesPosition().x - p.getPosition().x - 30)
+        + (data.getHeroesPosition().y - p.getPosition().y - 60) * (data.getHeroesPosition().y - p.getPosition().y)
+        - 60) < (data.getHeroesWidth() * .25 + data.getPhantomWidth()) * (data.getHeroesWidth() * .25 + data.getPhantomWidth()));
+
+  }
+
+  private boolean collisionHeroesPhantom() {
+    for (PhantomService p : data.getPhantoms())
+      if (collisionHeroesPhantom(p))
+        return true;
+    return false;
+  }
+
+  private boolean collisionHeroesFruits() {
+    for (FruitService p : data.getFruits())
+      if (collisionHeroesFruit(p))
+        return true;
+    return false;
+  }
+
+  public boolean gameON() {
+    return gameon;
   }
 }

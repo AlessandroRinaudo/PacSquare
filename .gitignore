@@ -1,2 +1,12 @@
 beans/*
+<<<<<<< HEAD
 /bin/
+=======
+init.sh
+src/images/.DS_Store
+bin/*
+META-INF/*
+.project
+.settings/org.eclipse.core.resources.prefs
+project_alpha_20210118.iml
+>>>>>>> 4775e6424870dbd02f0697b7136b3b26eb4f6b43

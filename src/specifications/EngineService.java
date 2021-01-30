@@ -12,6 +12,8 @@ public interface EngineService{
   public void init();
   public void start();
   public void stop();
+  public boolean gameON();
+
   public void setHeroesCommand(User.COMMAND c);
   public void releaseHeroesCommand(User.COMMAND c);
 }

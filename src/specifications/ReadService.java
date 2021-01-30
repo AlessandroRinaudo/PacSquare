@@ -15,10 +15,16 @@ public interface ReadService {
   public Position getHeroesPosition();
   public double getHeroesWidth();
   public double getHeroesHeight();
+  public double getFruitWidth();
+  public double getFruitHeight();
   public double getPhantomWidth();
   public double getPhantomHeight();
   public int getStepNumber();
   public int getScore();
+  public ArrayList<FruitService> getFruits();
   public ArrayList<PhantomService> getPhantoms();
+  public ArrayList<PhantomService> getPhantoms2();
+
+
   public Sound.SOUND getSoundEffect();
 }

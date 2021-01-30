@@ -8,16 +8,12 @@ package data.ia;
 
 import tools.Position;
 
-import specifications.PhantomService;
-import java.util.Random;
+import specifications.FruitService;
 
-public class MoveLeftPhantom implements PhantomService {
+public class Fruit implements FruitService {
   private Position position;
-  private Random gen;
 
-  public MoveLeftPhantom(Position p) {
-    gen = new Random();
-
+  public Fruit(Position p) {
     position = p;
   }
 
@@ -27,23 +23,8 @@ public class MoveLeftPhantom implements PhantomService {
   }
 
   @Override
-  public PhantomService.MOVE getAction() {
-
-    switch (gen.nextInt(4)) {
-      case 0:
-        return PhantomService.MOVE.LEFT;
-      case 1:
-        return PhantomService.MOVE.RIGHT;
-      default:
-        return PhantomService.MOVE.LEFT;
-
-      // case 2:
-      // simulator.moveUp();
-      // break;
-      // default:
-      // simulator.moveDown();
-      // break;
-    }
+  public FruitService.MOVE getAction() {
+    return FruitService.MOVE.LEFT;
   }
 
   @Override
